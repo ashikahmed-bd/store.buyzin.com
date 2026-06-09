@@ -1,91 +1,88 @@
 <script setup>
 import Default from "@/layouts/Default.vue";
-import { onMounted, reactive, ref } from "vue";
+import { X } from '@lucide/vue';
+import { onMounted, reactive } from "vue";
+
 import BaseSelect from "@/components/BaseSelect.vue";
 import BaseTextarea from "@/components/BaseTextarea.vue";
 import BaseInput from "@/components/BaseInput.vue";
-import IconClose from "@/components/icons/IconClose.vue";
-import BaseFile from "@/components/BaseFile.vue";
-import BaseMultipleFile from "@/components/BaseMultipleFile.vue";
+import BaseButton from "@/components/BaseButton.vue";
+import BaseEditor from "@/components/BaseEditor.vue";
+import FileUpload from "@/components/FileUpload.vue";
+
 import { useProductStore } from "@/stores/product";
 import { useCategoryStore } from "@/stores/category";
+import { useTaxStore } from "@/stores/tax";
+
+import { storeToRefs } from "pinia";
 import { useBrandStore } from "@/stores/brand";
 import { useRoute } from "vue-router";
-import { storeToRefs } from "pinia";
-import BaseSelectSearchable from "@/components/BaseSelectSearchable.vue";
 
 
 const route = useRoute();
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
+const taxStore = useTaxStore();
 const brandStore = useBrandStore();
 
+const { categories } = storeToRefs(categoryStore);
+const { taxes } = storeToRefs(taxStore);
+const { brands } = storeToRefs(brandStore);
 const { product } = storeToRefs(productStore);
 
-const categories = ref([]);
 
 const loadCategories = async () => {
-    const response = await categoryStore.all();
-    categories.value = response.data;
-}
-
-const selectedBrand = ref('');
-const selectedCollection = ref('');
+    await categoryStore.search('');
+};
 
 const loadBrands = async () => {
-    const response = await brandStore.all();
-    brands.value = response.data;
-}
+    await brandStore.search('');
+};
+
+const loadTaxes = async () => {
+    await taxStore.search('');
+};
+
 
 const form = reactive({
-    name: "",
+    name: '',
+    slug: '',
+    type: '',
+    summary: '',
+    description: '',
+    cover_url: '',
     category_id: '',
-    brand_id: selectedBrand,
-    collection_id: selectedCollection,
-
-    meta_title: "",
-    meta_description: "",
-    meta_keywords: "",
-    canonical_url: "",
-
-    overview: "",
-    description: "",
-    specifications: [],
-
-    base_price: '',
-    price: '',
-    schedule_start: '',
-    schedule_end: '',
-
-    quantity: 10,
+    brand_id: '',
+    tax_id: '',
+    base_price: 0,
+    price: 0,
+    start_date: '',
+    end_date: '',
+    quantity: 0,
     sold_count: 0,
+    specifications: [],
     weight: 0,
-    length: "",
-    width: "",
-    height: "",
-
-    cover: null,
-    og_image: null,
-    gallery: [],
-    video_url: "",
-
+    length: 0,
+    width: 0,
+    height: 0,
     is_shippable: true,
     cod_available: true,
-    estimated_delivery: "3-5 business days",
-
-    warranty: "1 Year Official Warranty",
     is_refundable: true,
-    refund_policy: "7 days replacement warranty",
-    conditions: "Product must be unused and in original packaging.",
-
-    is_featured: false,
-    is_trending: false,
-    status: "draft",
+    estimated_delivery: '',
+    warranty: '',
+    meta_title: '',
+    meta_description: '',
+    meta_keywords: '',
+    publish_at: null,
+    status: 'draft'
 });
 
 
 const addSpec = () => {
-    form.specifications.push({ title: "", items: [{ label: "", value: "" }] });
+    form.specifications.push({
+        title: "",
+        items: [{ label: "", value: "" }]
+    });
 };
 
 const removeSpec = (index) => {
@@ -93,7 +90,10 @@ const removeSpec = (index) => {
 };
 
 const addItem = (specIndex) => {
-    form.specifications[specIndex].items.push({ label: "", value: "" });
+    form.specifications[specIndex].items.push({
+        label: "",
+        value: ""
+    });
 };
 
 const removeItem = (specIndex, itemIndex) => {
@@ -101,49 +101,86 @@ const removeItem = (specIndex, itemIndex) => {
 };
 
 
-const loadProduct = async () => {
-    const { data } = await productStore.show(route.params.id);
-    form.name = data.name;
-    form.category_id = data.category?.id;
-    form.brand_id = data.brand?.id;
-    form.collection_id = data.collection?.id;
-    form.meta_title = data.meta_title;
-    form.meta_description = data.meta_description;
-    form.meta_keywords = data.meta_keywords;
-    form.canonical_url = data.canonical_url;
-    form.overview = data.overview;
-    form.description = data.description;
-    form.specifications = data.specifications;
-    form.base_price = data.base_price;
-    form.price = data.price;
-    form.schedule_start = data.schedule_start;
-    form.schedule_end = data.schedule_end;
-    form.quantity = data.quantity;
-    form.sold_count = data.sold_count;
-    form.weight = data.weight;
-    form.length = data.length;
-    form.width = data.width;
-    form.height = data.height;
-
-    form.video_url = data.video_url;
-    form.is_shippable = data.is_shippable;
-    form.cod_available = data.cod_available;
-    form.is_featured = data.is_featured;
-    form.is_trending = data.is_trending;
-    form.estimated_delivery = data.estimated_delivery;
-    form.warranty = data.warranty;
-    form.is_refundable = data.is_refundable;
-    form.refund_policy = data.refund_policy;
-    form.conditions = data.conditions;
-    form.status = data.status;
-}
-
 const submit = async () => {
     await productStore.update(route.params.id, form);
 };
 
+const media = reactive({
+    cover: null,
+    gallery: [],
+    video_url: '',
+});
+
+const mediaUpload = async () => {
+    const formData = new FormData();
+
+    if (media.cover) {
+        formData.append('cover', media.cover);
+    }
+
+    media.gallery.forEach((file) => {
+        formData.append('gallery[]', file);
+    });
+
+    if (media.video_url) {
+        formData.append('video_url', media.video_url);
+    }
+
+    await productStore.media(route.params.id, formData);
+};
+
+
+const loadProduct = async () => {
+    const product = await productStore.show(route.params.id);
+
+    form.name = product.data?.name ?? '';
+    form.slug = product.data?.slug ?? '';
+    form.type = product.data?.type ?? '';
+    form.summary = product.data?.summary ?? '';
+    form.description = product.data?.description ?? '';
+
+    media.video_url = product.data?.video_url ?? '';
+
+    form.category_id = product.data?.category?.id ?? '';
+    form.brand_id = product.data?.brand?.id ?? '';
+    form.tax_id = product.data?.tax?.id ?? '';
+
+    form.base_price = product.data?.base_price ?? 0;
+    form.price = product.data?.price ?? 0;
+
+    form.start_date = product.data?.start_date ?? '';
+    form.end_date = product.data?.end_date ?? '';
+
+    form.quantity = product.data?.quantity ?? 0;
+    form.sold_count = product.data?.sold_count ?? 0;
+
+    form.specifications = product.data?.specifications ?? [];
+
+    form.weight = product.data?.dimensions?.weight ?? 0;
+    form.length = product.data?.dimensions?.length ?? 0;
+    form.width = product.data?.dimensions?.width ?? 0;
+    form.height = product.data?.dimensions?.height ?? 0;
+
+    form.is_shippable = product.data?.is_shippable ?? true;
+    form.cod_available = product.data?.cod_available ?? true;
+    form.is_refundable = product.data?.is_refundable ?? true;
+
+    form.estimated_delivery = product.data?.estimated_delivery ?? '';
+    form.warranty = product.data?.warranty ?? '';
+
+    form.meta_title = product.data?.meta_title ?? '';
+    form.meta_description = product.data?.meta_description ?? '';
+    form.meta_keywords = product.data?.meta_keywords ?? '';
+
+    form.publish_at = product.data?.publish_at ?? null;
+    form.status = product.data?.status ?? '';
+
+
+};
+
 onMounted(() => {
     loadCategories();
+    loadTaxes();
     loadBrands();
     loadProduct();
 });
@@ -152,289 +189,291 @@ onMounted(() => {
 
 <template>
     <Default>
-        <main class="w-full">
-            <nav class="flex items-center justify-between mb-4">
-                <h4 class="text-xl font-semibold">Edit Product</h4>
-                <div class="flex items-center gap-2">
-                    <button type="button" @click="submit" :disabled="productStore.loading" class="base__button flex items-center justify-center gap-2
-           disabled:opacity-50 disabled:cursor-not-allowed">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">
+                    Create Product
+                </h1>
+                <p class="text-sm text-slate-500 mt-1">
+                    Create a new product and configure pricing, inventory and SEO.
+                </p>
+            </div>
 
-                        <svg v-if="productStore.loading" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                        </svg>
+            <RouterLink :to="{ name: 'products' }"
+                class="px-4 py-2 border rounded text-sm font-medium hover:bg-slate-50">
+                Back
+            </RouterLink>
+        </div>
 
-                        <span>
-                            {{ productStore.loading ? 'Saving...' : 'Save Change' }}
-                        </span>
-                    </button>
-                    <RouterLink :to="{ name: 'products' }"
-                        class="bg-primary text-white px-4 py-2 rounded-lg border text-sm ">
-                        All Products
-                    </RouterLink>
-                </div>
-
-            </nav>
-
-            {{ cover }}
-
-            <div class="py-2.5 space-y-4">
-                <div class="flex flex-wrap items-start gap-4">
-                    <div class="flex-1 space-y-4">
-                        <section class="bg-white rounded-xl">
-                            <h2 class="font-medium border-b border-dashed px-4 py-4">
-                                Product Info
+        <form @submit.prevent="submit">
+            <div class="grid lg:grid-cols-[1fr_340px] gap-5">
+                <div class="space-y-5">
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b">
+                            <h2 class="font-semibold">
+                                Product Information
                             </h2>
+                        </div>
 
-                            <div class="px-4 py-2.5 space-y-4">
-                                <BaseInput label="Product Name" v-model="form.name" :required="true" />
-
-                                <div class="grid grid-cols-3 gap-4">
-                                    <div class="form__group">
-                                        <label class="form__label">Categories</label>
-                                        <select v-model="form.category_id" class="form__control">
-                                            <option value="" disabled="">Select Categories</option>
-
-                                            <template v-for="category in categories" :key="category.id">
-                                                <!-- Parent -->
-                                                <option :value="category.id">
-                                                    {{ category.name }}
-                                                </option>
-
-                                                <!-- Children -->
-                                                <template v-for="child in category.children" :key="child.id">
-                                                    <option :value="child.id">
-                                                        -- {{ child.name }}
-                                                    </option>
-
-                                                    <!-- child -->
-                                                    <option v-for="item in child.children" :key="item.id"
-                                                        :value="item.id">
-                                                        --- {{ item.name }}
-                                                    </option>
-                                                </template>
-                                            </template>
-                                        </select>
-                                    </div>
-
-                                    <BaseSelectSearchable label="Brands" v-model="selectedBrand"
-                                        url="/api/v1/brands/search" placeholder="Enter brands" />
-
-                                    <BaseSelectSearchable label="Collections" v-model="selectedCollection"
-                                        url="/api/v1/collections/search" placeholder="Enter collections" />
-
-                                    <!-- <div class="form__group">
-                                        <label class="form__label">Brands</label>
-                                        <select v-model="form.brand_id" class="form__control">
-                                            <option value="">Individual Collection</option>
-                                            <template v-for="brand in brands" :key="brand.id">
-                                                <option :value="brand.id">
-                                                    {{ brand.name }}
-                                                </option>
-                                            </template>
-                                        </select>
-                                    </div> -->
-                                </div>
-
-                                <BaseInput label="Meta Title" v-model="form.meta_title"
-                                    placeholder="Enter meta title" />
-                                <BaseTextarea label="Meta Description" v-model="form.meta_description"
-                                    placeholder="Enter meta description" />
-                                <BaseTextarea label="Meta keywords" v-model="form.meta_keywords"
-                                    placeholder="Enter meta keywords" />
-
-                                <div>
-                                    <BaseInput label="Canonical url" v-model="form.canonical_url"
-                                        placeholder="e.g. wireless-bluetooth-headphone" error="" />
-                                    <small class="text-muted">https://example.com/{{ form.canonical_url
-                                    }}</small>
-                                </div>
-
-                                <div class="form__group">
-                                    <label class="form__lebel">Overview</label>
-                                    <QuillEditor theme="snow" toolbar="minimal" style="height: 150px"
-                                        v-model:content="form.overview" content-type="html" />
-                                </div>
-
-                                <div class="form__group">
-                                    <label class="form__lebel">Description</label>
-                                    <QuillEditor theme="snow" toolbar="full" style="height: 300px"
-                                        v-model:content="form.description" content-type="html" />
-                                </div>
+                        <div class="p-5 space-y-4">
+                            <BaseInput label="Name" v-model="form.name" required />
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <BaseInput label="Slug" v-model="form.slug" />
+                                <BaseSelect label="Type" v-model="form.type" :items="[
+                                    { id: 'simple', name: 'Simple' },
+                                    { id: 'variable', name: 'Variable' },
+                                    { id: 'digital', name: 'Digital' },
+                                    { id: 'service', name: 'Service' }
+                                ]" />
                             </div>
-                        </section>
 
-                        <!-- Specifications -->
-                        <section class="bg-white rounded-xl">
-                            <h2 class="font-medium border-b border-dashed px-4 py-4">
+                            <BaseTextarea label="Summary" :rows="6" v-model="form.summary" />
+                        </div>
+                    </section>
+
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b">
+                            <h2 class="font-semibold">
+                                Description
+                            </h2>
+                        </div>
+
+                        <div class="p-4">
+                            <BaseEditor v-model="form.description" />
+                        </div>
+                    </section>
+
+                    <!-- Specifications -->
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b flex items-center justify-between">
+                            <h2 class="font-semibold">
                                 Specifications
                             </h2>
+                            <button type="button" @click="addSpec" class="text-sm px-3 py-2 rounded-lg border">
+                                Add Group
+                            </button>
+                        </div>
 
-                            <div class="px-4 py-4">
-                                <div v-for="(spec, specIndex) in form.specifications" :key="specIndex"
-                                    class="border p-2 space-y-2 rounded mb-3">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <input type="text" v-model="spec.title" placeholder="Title (e.g., Display)"
-                                            class="form__control flex-1" />
-                                        <button @click="removeSpec(specIndex)" type="button"
-                                            class="bg-danger text-white p-2 rounded">
-                                            <IconClose class="size-5" />
-                                        </button>
-                                    </div>
-
-                                    <div v-for="(item, itemIndex) in spec.items" :key="itemIndex"
-                                        class="flex items-center gap-2 space-y-2">
-                                        <input type="text" v-model="item.label" placeholder="Label (e.g., Size)"
-                                            class="form__control" />
-                                        <input type="text" v-model="item.value" placeholder="Value (e.g., 6.67 inches)"
-                                            class="form__control" />
-                                        <button @click="removeItem(specIndex, itemIndex)" type="button"
-                                            class="bg-danger text-white p-2 rounded">
-                                            <IconClose class="size-5" />
-                                        </button>
-                                    </div>
-
-                                    <button @click="addItem(specIndex)" type="button" class="base__button">
-                                        Add Item
+                        <div class="p-5">
+                            <div v-for="(spec, index) in form.specifications" :key="index"
+                                class="border rounded-xl p-4 mb-4">
+                                <div class="flex gap-3 mb-3">
+                                    <input v-model="spec.title" placeholder="Group Name" class="form__control flex-1">
+                                    <button @click="removeSpec(index)" class="px-2 rounded bg-red-500 text-white">
+                                        <X />
                                     </button>
                                 </div>
 
-                                <button @click="addSpec" type="button" class="base__button w-full">
-                                    Add Specification
+                                <div v-for="(item, itemIndex) in spec.items" :key="itemIndex"
+                                    class="grid grid-cols-[1fr_1fr_auto] gap-2 mb-2">
+                                    <input v-model="item.label" placeholder="Label" class="form__control">
+                                    <input v-model="item.value" placeholder="Value" class="form__control">
+
+                                    <button @click="removeItem(index, itemIndex)"
+                                        class="px-2 rounded bg-red-500 text-white">
+                                        <X />
+                                    </button>
+                                </div>
+
+                                <button @click="addItem(index)" class="mt-2 text-sm font-medium text-primary">
+                                    Add Item
                                 </button>
                             </div>
-                        </section>
-                    </div>
+                        </div>
+                    </section>
 
-                    <div class="flex-none w-96 space-y-4">
-
-                        <!-- pricing -->
-                        <section class="bg-white rounded-xl">
-                            <h2 class="font-medium border-b border-dashed px-4 py-4">Pricing</h2>
-
-                            <div class="px-4 py-2.5 space-y-4">
-                                <div class="grid grid-cols-2 gap-3">
-                                    <BaseInput label="Base Price" type="number" placeholder="Enter base price"
-                                        v-model="form.base_price" />
-
-                                    <BaseInput label="Selling Price" type="number" placeholder="Enter selling price"
-                                        v-model="form.price" />
-
-                                    <BaseInput label="Schedule Start" type="date" v-model="form.schedule_start" />
-                                    <BaseInput label="Schedule End" type="date" v-model="form.schedule_end" />
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Shipping and Delivery -->
-                        <section class="bg-white rounded-xl">
-                            <h2 class="font-medium border-b border-dashed px-4 py-4">Shipping and Delivery</h2>
-
-                            <div class="px-4 py-2.5 space-y-4">
-                                <div class="grid grid-cols-2 gap-3">
-                                    <BaseInput label="Quantity" type="number" v-model="form.quantity"
-                                        placeholder="Enter quentity" />
-
-                                    <BaseInput label="Sold Count" type="number" v-model="form.sold_count"
-                                        placeholder="Enter sold count" />
-                                    <BaseInput label="Weight (kg)" type="number" v-model="form.weight"
-                                        placeholder="e.g. 1.25" />
-
-                                    <BaseInput label="Length (cm)" type="number" v-model="form.length"
-                                        placeholder="e.g. 30" />
-
-                                    <BaseInput label="Width (cm)" type="number" v-model="form.width"
-                                        placeholder="e.g. 20" />
-
-                                    <BaseInput label="Height (cm)" type="number" v-model="form.height"
-                                        placeholder="e.g. 10" />
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Media -->
-                        <section class="bg-white rounded-xl">
-                            <h2 class="font-medium border-b border-dashed px-4 py-4">Media</h2>
-                            <div class="px-4 py-2.5 space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <BaseFile label="Cover" :server="`api/vendor/products/${product.data?.id}/cover`"
-                                        name="cover" :required="true" error="" :preview="product.data?.cover_url" />
-
-                                    <BaseFile label="OG Image"
-                                        :server="`api/vendor/products/${product.data?.id}/og-image`" name="og_image"
-                                        :required="true" error="" :preview="product.data?.og_image_url" />
-                                </div>
-
-                                <BaseMultipleFile label="Gallery"
-                                    :server="`api/vendor/products/${product.data?.id}/gallery`" name="gallery"
-                                    :required="true" error="" :preview="product.data?.gallery" />
-
-                                <BaseInput label="Video URL" type="url" v-model="form.video_url"
-                                    placeholder="https://www.youtube.com/watch?v=bTqVqk7FSmY" />
-                            </div>
-                        </section>
-
-                        <!-- Visibility -->
-                        <section class="bg-white rounded-xl">
-                            <h2 class="font-medium border-b border-dashed px-4 py-4">
-                                Published
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b">
+                            <h2 class="font-semibold">
+                                SEO Settings
                             </h2>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <BaseInput label="Meta Title" v-model="form.meta_title" />
+                            <BaseTextarea label="Meta Description" v-model="form.meta_description" />
+                            <BaseTextarea label="Meta Keywords" v-model="form.meta_keywords" />
+                        </div>
+                    </section>
 
-                            <div class="px-4 py-2.5">
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b">
+                            <h2 class="font-semibold">
+                                Media
+                            </h2>
+                        </div>
 
-                                <div class="flex items-center gap-2 mb-2">
-                                    <input type="checkbox" v-model="form.is_shippable" id="shippable" class="h-4 w-4" />
-                                    <label for="shippable" class="text-gray-700">Shippable</label>
-                                </div>
+                        <form @submit.prevent="mediaUpload" enctype="multipart/form-data" class="p-4 space-y-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div class="block">
+                                    <BaseInput v-model="media.video_url" label="Video URL"
+                                        description="YouTube, Vimeo or other video link" />
 
-                                <div class="flex items-center gap-2 mb-2">
-                                    <input type="checkbox" v-model="form.cod_available" id="cod" class="h-4 w-4" />
-                                    <label for="cod" class="text-gray-700">Cash on Delivery</label>
-                                </div>
-
-                                <div class="flex items-center gap-2 mb-2">
-                                    <input type="checkbox" v-model="form.is_featured" id="cod" class="h-4 w-4" />
-                                    <label for="is_featured" class="text-gray-700">Featured</label>
-                                </div>
-
-                                <div class="flex items-center gap-2 mb-2">
-                                    <input type="checkbox" v-model="form.is_trending" id="cod" class="h-4 w-4" />
-                                    <label for="is_trending" class="text-gray-700">Trending</label>
-                                </div>
-
-                                <div>
-                                    <label class="block text-gray-700 mb-1">Estimated Delivery</label>
-                                    <input type="text" v-model="form.estimated_delivery"
-                                        placeholder="e.g. 3-5 business days"
-                                        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                                </div>
-
-                                <BaseInput label="Warranty" v-model="form.warranty"
-                                    placeholder="Enter warranty period" />
-
-                                <div class="group">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <input type="checkbox" v-model="form.is_refundable" id="is_refundable"
-                                            class="h-4 w-4" />
-                                        <label for="is_refundable" class="text-gray-700">Is Refundable</label>
+                                    <div class="form__group">
+                                        <label class="form__label">Gallery</label>
+                                        <input type="file" multiple class="form__file"
+                                            @change="media.gallery = Array.from($event.target.files)"
+                                            accept="image/*" />
                                     </div>
-                                    <input type="text" v-if="form.is_refundable" v-model="form.refund_policy"
-                                        class="form__control" placeholder="Is the product refundable?" />
+
+                                    <div v-if="product.data?.gallery"
+                                        class="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 py-2">
+                                        <div v-for="(image, index) in product.data?.gallery" :key="index"
+                                            class="group relative overflow-hidden rounded border bg-white">
+                                            <img :src="image" class="aspect-square h-full w-full object-cover" alt="" />
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <BaseTextarea label="Conditions" v-model="form.conditions"
-                                    placeholder="Enter product conditions" />
+                                <div class="form__group">
+                                    <label class="form__label">Cover</label>
+                                    <input type="file" class="form__file" accept="image/*"
+                                        @change="media.cover = $event.target.files?.[0]" />
 
-                                <BaseSelect label="Status" v-model="form.status" :items="[
-                                    { id: 'public', name: 'Public' },
-                                    { id: 'draft', name: 'Draft', },
-                                ]" />
+                                    <div v-if="product.data?.cover_url" class="mt-3">
+                                        <img :src="product.data?.cover_url" alt="Cover Preview"
+                                            class="w-24 h-auto object-cover rounded border" />
+                                    </div>
+                                </div>
                             </div>
-                        </section>
-                    </div>
+
+                            <BaseButton :loading="productStore.loading">Update</BaseButton>
+                        </form>
+                    </section>
+                </div>
+
+                <div class="space-y-5">
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b">
+                            <h2 class="font-semibold">
+                                Product Meta
+                            </h2>
+                        </div>
+                        <div class="p-5 space-y-4">
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Categories
+                                </label>
+
+                                <div class="relative">
+                                    <select v-model="form.category_id"
+                                        class="w-full appearance rounded border border-border px-4 py-2.5">
+
+                                        <option value="">Select Category</option>
+
+                                        <template v-for="category in categories?.data ?? []" :key="category.id">
+                                            <option :value="category.id">
+                                                {{ category.name }}
+                                            </option>
+
+                                            <template v-if="category.children?.length">
+                                                <template v-for="child in category.children" :key="child.id">
+                                                    <option :value="child.id">
+                                                        - {{ child.name }}
+                                                    </option>
+
+                                                    <template v-if="child.children?.length">
+                                                        <option v-for="grand in child.children" :key="grand.id"
+                                                            :value="grand.id">
+                                                            -- {{ grand.name }}
+                                                        </option>
+                                                    </template>
+                                                </template>
+                                            </template>
+                                        </template>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            <BaseSelect label="Brand" v-model="form.brand_id" :items="brands?.data?.map(brand => ({
+                                id: brand.id, name: brand.name
+                            }))" placeholder="Select brand" />
+
+                            <BaseSelect label="Taxes" v-model="form.tax_id" :items="taxes.data?.map(tax => ({
+                                id: tax.id, name: tax.name
+                            }))" placeholder="Select tax" />
+
+                        </div>
+                    </section>
+
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b">
+                            <h2 class="font-semibold">
+                                Pricing
+                            </h2>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <BaseInput label="Base Price" type="number" v-model="form.base_price" />
+                            <BaseInput label="Selling Price" type="number" v-model="form.price" />
+                            <div class="grid grid-cols-2 gap-3">
+                                <BaseInput type="date" label="Start" v-model="form.start_date" />
+                                <BaseInput type="date" label="End" v-model="form.end_date" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b">
+                            <h2 class="font-semibold">
+                                Inventory
+                            </h2>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <BaseInput label="Quantity" type="number" v-model="form.quantity" />
+                            <BaseInput label="Sold Count" type="number" v-model="form.sold_count" />
+                        </div>
+                    </section>
+
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b">
+                            <h2 class="font-semibold">
+                                Shipping
+                            </h2>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <BaseInput label="Weight (KG)" v-model="form.weight" />
+                                <BaseInput label="Length  (CM)" v-model="form.length" />
+                                <BaseInput label="Width  (CM)" v-model="form.width" />
+                                <BaseInput label="Height  (CM)" v-model="form.height" />
+                            </div>
+                            <label class="flex items-center justify-between">
+                                <span>Shippable</span>
+                                <input type="checkbox" v-model="form.is_shippable">
+                            </label>
+                            <label class="flex items-center justify-between">
+                                <span>Cash On Delivery</span>
+                                <input type="checkbox" v-model="form.cod_available">
+                            </label>
+                            <label class="flex items-center justify-between">
+                                <span>Refundable</span>
+                                <input type="checkbox" v-model="form.is_refundable">
+                            </label>
+                            <BaseInput label="Estimated Delivery" v-model="form.estimated_delivery" />
+                            <BaseInput label="Warranty" v-model="form.warranty" />
+                        </div>
+                    </section>
+
+                    <section class="bg-white rounded-2xl border border-slate-200">
+                        <div class="px-5 py-4 border-b">
+                            <h2 class="font-semibold">
+                                Publish
+                            </h2>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <BaseSelect label="Status" v-model="form.status" :items="[
+                                { id: 'draft', name: 'Draft' },
+                                { id: 'public', name: 'Public' }
+                            ]" />
+                            <BaseInput type="date" label="Publish At" v-model="form.publish_at" />
+                        </div>
+                    </section>
+
+                    <BaseButton :loading="productStore.loading" class="w-full">Submit</BaseButton>
                 </div>
             </div>
-        </main>
+        </form>
     </Default>
 </template>
 

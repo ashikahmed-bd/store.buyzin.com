@@ -51,7 +51,7 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-    async getProfile() {
+    async getUser() {
       if (this.user) return this.user;
       try {
         const token = this.token;

@@ -13,7 +13,6 @@ const loadProducts = async (page = 1) => {
   await productStore.all(page);
 }
 
-
 onMounted(() => {
   loadProducts();
 })
@@ -34,15 +33,13 @@ onMounted(() => {
         <div class="bg-white space-y-4 rounded-2xl p-4">
           <div class="relative overflow-x-auto bg-white rounded-xl">
             <table class="min-w-full text-sm">
-              <!-- Table Head -->
               <thead class="bg-gray-50 border-b">
                 <tr class="text-left text-gray-600 font-medium">
                   <th class="px-4 py-3">Product</th>
-                  <th class="px-4 py-3">Category</th>
-                  <th class="px-4 py-3">Brand</th>
                   <th class="px-4 py-3">SKU</th>
                   <th class="px-4 py-3">Price</th>
                   <th class="px-4 py-3">Stock</th>
+                  <th class="px-4 py-3">Sold</th>
                   <th class="px-4 py-3">Status</th>
                   <th class="px-4 py-3 text-right">Action</th>
                 </tr>
@@ -50,66 +47,62 @@ onMounted(() => {
 
               <tbody class="divide-y">
                 <tr v-for="product in products.data" :key="product.id" class="hover:bg-gray-50 transition">
-
                   <td class="px-4 py-3">
                     <div class="flex items-center gap-3">
-                      <img :src="product.cover_url" :alt="product.name" class="w-10 h-10 rounded-lg object-cover" />
+                      <img :src="product.cover_url" :alt="product.name" class="w-auto h-10 rounded object-cover" />
                       <div>
                         <h3 class="font-medium text-gray-900">
                           {{ product.name }}
                         </h3>
 
-                        <div class="flex items-center">
-                          <p v-for="category in product.categories" :key="category.id" class="text-xs text-gray-500
-         after:content-['•']
-         after:mx-1
-         last:after:content-none">
-                            {{ category.name }}
-                          </p>
-                        </div>
-
+                        <p class="text-xs text-gray-500">
+                          ID: {{ product.id }}
+                        </p>
                       </div>
                     </div>
                   </td>
 
-                  <td class="px-4 py-3 text-gray-600">
-                    {{ product.category?.name }}
-                  </td>
-                  <td class="px-4 py-3 text-gray-600">
-                    {{ product.brand?.name }}
-                  </td>
-                  <td class="px-4 py-3 text-gray-600">
+                  <td class="px-4 py-3">
                     {{ product.sku }}
                   </td>
 
                   <td class="px-4 py-3">
-                    <div v-if="product.price" class="font-font-medium">
-                      <del class="font-normal ml-2">{{ product.base_price_formatted }}</del>
-                      <span class="font-normal ml-2">{{ product.price_formatted }}</span>
+                    <div v-if="product.price">
+                      <p class="font-medium">
+                        {{ product.price_formatted }}
+                      </p>
+
+                      <del class="text-xs text-gray-500">
+                        {{ product.base_price_formatted }}
+                      </del>
                     </div>
-                    <p v-else class="font-font-medium">{{ product.base_price_formatted }}</p>
+
+                    <p v-else class="font-medium">
+                      {{ product.base_price_formatted }}
+                    </p>
+                  </td>
+                  <td class="px-4 py-3">
+                    {{ product.quantity }}
+                  </td>
+                  <td class="px-4 py-3">
+                    {{ product.sold_count }}
                   </td>
 
                   <td class="px-4 py-3">
-                    <span class="text-green-600 font-medium">
-                      {{ product.quantity }}
-                    </span>
-                  </td>
-
-                  <td class="px-4 py-3">
-                    <span class="px-2.5 py-1 capitalize rounded-full text-xs font-medium bg-green-100 text-green-700">
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium capitalize" :class="{
+                      'bg-green-100 text-green-700': product.status === 'published',
+                      'bg-yellow-100 text-yellow-700': product.status === 'draft',
+                      'bg-red-100 text-red-700': product.status === 'inactive'
+                    }">
                       {{ product.status }}
                     </span>
                   </td>
 
-                  <!-- Actions -->
                   <td class="px-4 py-3 text-right">
-                    <div class="flex justify-end gap-2">
-                      <RouterLink :to="{ name: 'products.edit', params: { id: product.id } }"
-                        class="bg-primary text-white px-4 py-1 text-xs rounded">
-                        Edit
-                      </RouterLink>
-                    </div>
+                    <RouterLink :to="{ name: 'products.edit', params: { id: product.id } }"
+                      class="bg-primary text-white px-4 py-1 text-xs rounded">
+                      Edit
+                    </RouterLink>
                   </td>
                 </tr>
               </tbody>

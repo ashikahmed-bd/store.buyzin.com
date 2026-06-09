@@ -1,24 +1,29 @@
-import { useAuthStore } from "@/stores/auth";
 import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+
   routes: [
     {
       path: "/register",
       name: "register",
       component: () => import("../views/auth/register.vue"),
+      meta: { guest: true },
     },
+
     {
       path: "/login",
       name: "login",
       component: () => import("../views/auth/login.vue"),
+      meta: { guest: true },
     },
 
     {
       path: "/forgot",
       name: "forgot",
       component: () => import("../views/auth/forgot.vue"),
+      meta: { guest: true },
     },
 
     {
@@ -70,12 +75,14 @@ const router = createRouter({
       meta: { auth: true },
     },
 
+
     {
-      path: "/payouts",
-      name: "payouts",
-      component: () => import("../views/payouts/index.vue"),
+      path: "/notifications",
+      name: "notifications",
+      component: () => import("../views/notifications/index.vue"),
       meta: { auth: true },
     },
+
     {
       path: "/settings",
       name: "settings",
@@ -85,18 +92,21 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach(async (to, from, next) => {
-  const authStore = useAuthStore();
 
-  if (to.meta.auth) {
-    await authStore.getProfile();
+router.beforeEach(async (to) => {
+  const auth = useAuthStore();
 
-    if (!authStore.user) {
-      return next("/login");
-    }
+  if (!auth.user) {
+    await auth.getUser();
   }
 
-  next();
+  if (to.meta.auth && !auth.loggedIn) {
+    return { name: "login", query: { redirect: to.fullPath } };
+  }
+
+  if (to.meta.guest && auth.loggedIn) {
+    return "/";
+  }
 });
 
 export default router;

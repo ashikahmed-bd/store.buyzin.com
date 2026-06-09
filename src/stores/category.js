@@ -5,6 +5,7 @@ export const useCategoryStore = defineStore("category", {
   state: () => ({
     loading: false,
     errors: {},
+    categories: {}
   }),
 
   getters: {},
@@ -35,6 +36,7 @@ export const useCategoryStore = defineStore("category", {
           },
         });
         if (response.status === 200) {
+          this.categories = response.data;
           return Promise.resolve(response.data);
         }
       } catch (error) {
