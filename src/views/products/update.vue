@@ -8,7 +8,6 @@ import BaseTextarea from "@/components/BaseTextarea.vue";
 import BaseInput from "@/components/BaseInput.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseEditor from "@/components/BaseEditor.vue";
-import FileUpload from "@/components/FileUpload.vue";
 
 import { useProductStore } from "@/stores/product";
 import { useCategoryStore } from "@/stores/category";

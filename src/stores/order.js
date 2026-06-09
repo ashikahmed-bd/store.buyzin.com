@@ -1,7 +1,6 @@
 import apiClient from "@/utils/axios";
 import { defineStore } from "pinia";
-import { useToast } from "vue-toastification";
-const toast = useToast();
+import { toast } from 'vue-sonner';
 
 export const useOrderStore = defineStore("order", {
   state: () => ({
