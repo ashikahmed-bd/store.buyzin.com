@@ -1,6 +1,6 @@
 import apiClient from "@/utils/axios";
 import { defineStore } from "pinia";
-import { toast } from 'vue-sonner'
+import { toast } from 'vue-sonner';
 
 export const useProductStore = defineStore("product", {
   state: () => ({
