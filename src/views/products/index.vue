@@ -47,7 +47,7 @@ onMounted(() => {
 
               <tbody class="divide-y">
                 <tr v-for="product in products.data" :key="product.id" class="hover:bg-gray-50 transition">
-                  <td class="px-4 py-3">
+                  <td class="px-4 py-3 max-w-2xs">
                     <div class="flex items-center gap-3">
                       <img :src="product.cover_url" :alt="product.name" class="w-auto h-10 rounded object-cover" />
                       <div>
