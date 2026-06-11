@@ -193,7 +193,7 @@ onMounted(() => {
                                     </button>
                                 </div>
 
-                                <button @click="addItem(index)" class="mt-2 text-sm font-medium text-primary">
+                                <button type="button" @click="addItem(index)" class="mt-2 text-sm font-medium text-primary">
                                     Add Item
                                 </button>
                             </div>
