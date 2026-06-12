@@ -18,7 +18,7 @@ const updateValue = (e) => {
 
 <template>
   <div class="relative block mb-3">
-    <label v-if="label" class="block capitalize">
+    <label v-if="label" class="block capitalize font-medium">
       {{ label }} <span v-if="required" class="text-red-500">*</span>
     </label>
 

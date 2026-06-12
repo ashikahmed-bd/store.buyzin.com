@@ -41,6 +41,7 @@ const form = reactive({
     name: '',
     slug: '',
     type: 'simple',
+    features: '',
     summary: '',
     description: '',
     category_id: '',
@@ -135,8 +136,8 @@ onMounted(() => {
 
                         <div class="p-5 space-y-4">
                             <BaseInput label="Name" v-model="form.name" required />
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <BaseInput label="Slug" v-model="form.slug" />
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <BaseInput label="Slug" v-model="form.slug" class="col-span-2"/>
                                 <BaseSelect label="Type" v-model="form.type" :items="[
                                     { id: 'simple', name: 'Simple' },
                                     { id: 'variable', name: 'Variable' },
@@ -144,7 +145,7 @@ onMounted(() => {
                                     { id: 'service', name: 'Service' }
                                 ]" />
                             </div>
-
+                            <BaseTextarea label="Features" :rows="6" v-model="form.features" />
                             <BaseTextarea label="Summary" :rows="6" v-model="form.summary" />
                         </div>
                     </section>
@@ -193,7 +194,8 @@ onMounted(() => {
                                     </button>
                                 </div>
 
-                                <button type="button" @click="addItem(index)" class="mt-2 text-sm font-medium text-primary">
+                                <button type="button" @click="addItem(index)"
+                                    class="mt-2 text-sm font-medium text-primary">
                                     Add Item
                                 </button>
                             </div>
@@ -279,10 +281,8 @@ onMounted(() => {
                         <div class="p-5 space-y-4">
                             <BaseInput label="Base Price" type="number" v-model="form.base_price" />
                             <BaseInput label="Selling Price" type="number" v-model="form.price" />
-                            <div class="grid grid-cols-2 gap-3">
-                                <BaseInput type="date" label="Start" v-model="form.start_date" />
-                                <BaseInput type="date" label="End" v-model="form.end_date" />
-                            </div>
+                            <BaseInput type="date" label="Start" v-model="form.start_date" />
+                            <BaseInput type="date" label="End" v-model="form.end_date" />
                         </div>
                     </section>
 
@@ -323,8 +323,8 @@ onMounted(() => {
                                 <span>Refundable</span>
                                 <input type="checkbox" v-model="form.is_refundable">
                             </label>
-                            <BaseInput label="Estimated Delivery" v-model="form.estimated_delivery" />
-                            <BaseInput label="Warranty" v-model="form.warranty" />
+                            <BaseTextarea label="Estimated Delivery" v-model="form.estimated_delivery" />
+                            <BaseTextarea label="Warranty" v-model="form.warranty" />
                         </div>
                     </section>
 

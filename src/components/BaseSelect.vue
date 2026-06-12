@@ -24,7 +24,7 @@ const modelValue = computed({
 
 <template>
   <div class="relative block mb-3">
-    <label v-if="label" class="block capitalize">
+    <label v-if="label" class="block capitalize font-medium">
       {{ label }}
     </label>
     <select v-model="modelValue" :disabled="disabled" :class="[
