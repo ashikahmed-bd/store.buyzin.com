@@ -54,14 +54,15 @@ const form = reactive({
     quantity: 0,
     sold_count: 0,
     specifications: [],
-    weight: '',
-    length: '',
-    width: '',
-    height: '',
+    weight: 0,
+    length: 0,
+    width: 0,
+    height: 0,
     is_shippable: true,
     cod_available: true,
     is_refundable: true,
     estimated_delivery: '',
+    return_policy: '',
     warranty: '',
     meta_title: '',
     meta_description: '',
@@ -137,7 +138,7 @@ onMounted(() => {
                         <div class="p-5 space-y-4">
                             <BaseInput label="Name" v-model="form.name" required />
                             <div class="grid md:grid-cols-3 gap-4">
-                                <BaseInput label="Slug" v-model="form.slug" class="col-span-2"/>
+                                <BaseInput label="Slug" v-model="form.slug" class="col-span-2" />
                                 <BaseSelect label="Type" v-model="form.type" :items="[
                                     { id: 'simple', name: 'Simple' },
                                     { id: 'variable', name: 'Variable' },
@@ -324,6 +325,7 @@ onMounted(() => {
                                 <input type="checkbox" v-model="form.is_refundable">
                             </label>
                             <BaseTextarea label="Estimated Delivery" v-model="form.estimated_delivery" />
+                            <BaseTextarea label="Return Policy" v-model="form.return_policy" />
                             <BaseTextarea label="Warranty" v-model="form.warranty" />
                         </div>
                     </section>

@@ -69,6 +69,7 @@ const form = reactive({
     cod_available: true,
     is_refundable: true,
     estimated_delivery: '',
+    return_policy: '',
     warranty: '',
     meta_title: '',
     meta_description: '',
@@ -166,6 +167,7 @@ const loadProduct = async () => {
     form.is_refundable = product.data?.is_refundable ?? true;
 
     form.estimated_delivery = product.data?.estimated_delivery ?? '';
+    form.return_policy = product.data?.return_policy ?? '';
     form.warranty = product.data?.warranty ?? '';
 
     form.meta_title = product.data?.meta_title ?? '';
@@ -455,7 +457,7 @@ onMounted(() => {
                                 <input type="checkbox" v-model="form.is_refundable">
                             </label>
                             <BaseTextarea label="Estimated Delivery" v-model="form.estimated_delivery"/>
-                        
+                            <BaseTextarea label="Return Policy" v-model="form.return_policy" />
                             <BaseTextarea label="Warranty" v-model="form.warranty" />
                         </div>
                     </section>
