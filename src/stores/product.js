@@ -16,7 +16,7 @@ export const useProductStore = defineStore("product", {
     async all(page) {
       this.loading = true;
       try {
-        const response = await apiClient.get("/api/v1/products", {
+        const response = await apiClient.get("/api/vendor/products", {
           params: {
             page: page,
           },
@@ -37,7 +37,7 @@ export const useProductStore = defineStore("product", {
     async store(formData) {
       this.loading = true;
       try {
-        const response = await apiClient.post("/api/v1/products", formData, {
+        const response = await apiClient.post("/api/vendor/products", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -59,7 +59,7 @@ export const useProductStore = defineStore("product", {
 
     async show(product) {
       try {
-        const response = await apiClient.get(`/api/v1/products/${product}`);
+        const response = await apiClient.get(`/api/vendor/products/${product}`);
         if (response.status === 200) {
           this.product = response.data;
           return Promise.resolve(response.data);
@@ -74,7 +74,7 @@ export const useProductStore = defineStore("product", {
     async update(product, payload) {
       this.loading = true;
       try {
-        const response = await apiClient.put(`/api/v1/products/${product}`, payload);
+        const response = await apiClient.put(`/api/vendor/products/${product}`, payload);
         if (response.status === 200) {
           toast.success(response.data.message);
           return Promise.resolve(response.data);
@@ -92,7 +92,7 @@ export const useProductStore = defineStore("product", {
     async media(product, payload) {
       this.loading = true;
       try {
-        const response = await apiClient.post(`/api/v1/products/${product}/media`, payload);
+        const response = await apiClient.post(`/api/vendor/products/${product}/media`, payload);
         if (response.status === 200) {
           toast.success(response.data.message);
 
