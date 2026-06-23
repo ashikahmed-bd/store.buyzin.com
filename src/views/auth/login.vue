@@ -9,8 +9,8 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 const form = reactive({
-  phone: "01516598533",
-  password: "password",
+  phone: "",
+  password: "",
 });
 
 const submit = async () => {
