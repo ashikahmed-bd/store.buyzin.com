@@ -56,8 +56,8 @@ const form = reactive({
     tax_id: '',
     base_price: 0,
     price: 0,
-    start_date: '',
-    end_date: '',
+    start_at: '',
+    end_at: '',
     quantity: 0,
     sold_count: 0,
     specifications: [],
@@ -149,8 +149,8 @@ const loadProduct = async () => {
     form.base_price = product.data?.base_price ?? 0;
     form.price = product.data?.price ?? 0;
 
-    form.start_date = product.data?.start_date ?? '';
-    form.end_date = product.data?.end_date ?? '';
+    form.start_at = product.data?.start_at ?? '';
+    form.end_at = product.data?.end_at ?? '';
 
     form.quantity = product.data?.quantity ?? 0;
     form.sold_count = product.data?.sold_count ?? 0;
@@ -283,7 +283,8 @@ onMounted(() => {
                                     </button>
                                 </div>
 
-                                <button type="button" @click="addItem(index)" class="mt-2 text-sm font-medium text-primary">
+                                <button type="button" @click="addItem(index)"
+                                    class="mt-2 text-sm font-medium text-primary">
                                     Add Item
                                 </button>
                             </div>
@@ -414,8 +415,8 @@ onMounted(() => {
                         <div class="p-5 space-y-4">
                             <BaseInput label="Base Price" type="number" v-model="form.base_price" />
                             <BaseInput label="Selling Price" type="number" v-model="form.price" />
-                            <BaseInput type="date" label="Start" v-model="form.start_date" />
-                            <BaseInput type="date" label="End" v-model="form.end_date" />
+                            <BaseInput type="date" label="Start" v-model="form.start_at" />
+                            <BaseInput type="date" label="End" v-model="form.end_at" />
                         </div>
                     </section>
 
@@ -456,7 +457,7 @@ onMounted(() => {
                                 <span>Refundable</span>
                                 <input type="checkbox" v-model="form.is_refundable">
                             </label>
-                            <BaseTextarea label="Estimated Delivery" v-model="form.estimated_delivery"/>
+                            <BaseTextarea label="Estimated Delivery" v-model="form.estimated_delivery" />
                             <BaseTextarea label="Return Policy" v-model="form.return_policy" />
                             <BaseTextarea label="Warranty" v-model="form.warranty" />
                         </div>

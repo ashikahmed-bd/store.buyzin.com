@@ -49,8 +49,8 @@ const form = reactive({
     tax_id: '',
     base_price: '',
     price: '',
-    start_date: '',
-    end_date: '',
+    start_at: '',
+    end_at: '',
     quantity: 0,
     sold_count: 0,
     specifications: [],
@@ -282,8 +282,8 @@ onMounted(() => {
                         <div class="p-5 space-y-4">
                             <BaseInput label="Base Price" type="number" v-model="form.base_price" />
                             <BaseInput label="Selling Price" type="number" v-model="form.price" />
-                            <BaseInput type="date" label="Start" v-model="form.start_date" />
-                            <BaseInput type="date" label="End" v-model="form.end_date" />
+                            <BaseInput type="date" label="Start" v-model="form.start_at" />
+                            <BaseInput type="date" label="End" v-model="form.end_at" />
                         </div>
                     </section>
 
