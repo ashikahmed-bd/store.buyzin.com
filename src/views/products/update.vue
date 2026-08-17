@@ -531,51 +531,16 @@ onMounted(() => {
                 <BaseInput label="Width  (CM)" v-model="form.width" />
                 <BaseInput label="Height  (CM)" v-model="form.height" />
               </div>
-              <label class="flex items-center justify-between">
-                <span>Shippable</span>
-                <input type="checkbox" v-model="form.is_shippable" />
-              </label>
-              <label class="flex items-center justify-between">
-                <span>Cash On Delivery</span>
-                <input type="checkbox" v-model="form.cod_available" />
-              </label>
-              <label class="flex items-center justify-between">
-                <span>Refundable</span>
-                <input type="checkbox" v-model="form.is_refundable" />
-              </label>
 
-              <BaseSelect
+              <BaseTextarea
                 label="Estimated Delivery"
                 v-model="form.estimated_delivery"
-                :options="
-                  config.delivery.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                  }))
-                "
               />
-
-              <BaseSelect
+              <BaseTextarea
                 label="Return Policy"
                 v-model="form.return_policy"
-                :options="
-                  config.return.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                  }))
-                "
               />
-
-              <BaseSelect
-                label="Warranty"
-                v-model="form.warranty"
-                :options="
-                  config.warranty.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                  }))
-                "
-              />
+              <BaseTextarea label="Warranty" v-model="form.warranty" />
 
               <BaseSelect
                 label="Status"

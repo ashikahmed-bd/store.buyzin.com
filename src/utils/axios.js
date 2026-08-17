@@ -2,7 +2,7 @@ import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://127.0.0.1:8000", // http://127.0.0.1:8000  https://api.buyzin.com
+  baseURL: "https://api.buyzin.com", // http://127.0.0.1:8000  https://api.buyzin.com
   withCredentials: false,
   withXSRFToken: false,
 });

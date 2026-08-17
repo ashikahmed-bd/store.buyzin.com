@@ -3,8 +3,6 @@ import "./assets/main.css";
 import { Vueginate } from "vueginate";
 import "vueginate/css/vueginate.css";
 
-import { getAppConfig } from "@/services/config";
-
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
@@ -21,5 +19,4 @@ app.use(pinia);
 app.use(router);
 app.component("Pagination", Vueginate);
 
-await getAppConfig();
 app.mount("#app");
