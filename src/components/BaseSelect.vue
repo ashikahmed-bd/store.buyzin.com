@@ -4,7 +4,7 @@ import { computed } from "vue";
 const props = defineProps({
   label: String,
   modelValue: [String, Number],
-  items: {
+  options: {
     type: Array,
     default: () => [],
   },
@@ -27,16 +27,20 @@ const modelValue = computed({
     <label v-if="label" class="block capitalize font-medium">
       {{ label }}
     </label>
-    <select v-model="modelValue" :disabled="disabled" :class="[
-      'w-full border rounded px-3 py-2 focus:outline-cyan-500 focus:ring focus:ring-cyan-200',
-      error ? 'border-red-500' : 'border-gray-300',
-    ]">
+    <select
+      v-model="modelValue"
+      :disabled="disabled"
+      :class="[
+        'w-full border rounded px-3 py-2 focus:outline-cyan-500 focus:ring focus:ring-cyan-200',
+        error ? 'border-red-500' : 'border-gray-300',
+      ]"
+    >
       <option value="" disabled>
         {{ placeholder || `Select ${label}` }}
       </option>
 
-      <option v-for="item in items" :key="item.id" :value="item.id">
-        {{ item.name }}
+      <option v-for="option in options" :key="option.id" :value="option.id">
+        {{ option.name }}
       </option>
     </select>
     <small v-if="error" class="text-red-500">{{ error[0] }}</small>
@@ -45,5 +49,5 @@ const modelValue = computed({
 
 <style scoped>
 /* <BaseSelect label="Status" v-model="form.collection_id"
-    :items="brands.map(brand => ({ id: brand.id, name: brand.name }))" /> */
+    :options="brands.map(brand => ({ id: brand.id, name: brand.name }))" /> */
 </style>

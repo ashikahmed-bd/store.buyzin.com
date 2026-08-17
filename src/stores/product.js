@@ -1,6 +1,6 @@
 import apiClient from "@/utils/axios";
 import { defineStore } from "pinia";
-import { toast } from 'vue-sonner';
+import { toast } from "vue-sonner";
 
 export const useProductStore = defineStore("product", {
   state: () => ({
@@ -16,7 +16,7 @@ export const useProductStore = defineStore("product", {
     async all(page) {
       this.loading = true;
       try {
-        const response = await apiClient.get("/api/vendor/products", {
+        const response = await apiClient.get("/api/v1/products", {
           params: {
             page: page,
           },
@@ -37,7 +37,7 @@ export const useProductStore = defineStore("product", {
     async store(formData) {
       this.loading = true;
       try {
-        const response = await apiClient.post("/api/vendor/products", formData, {
+        const response = await apiClient.post("/api/v1/products", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -59,7 +59,7 @@ export const useProductStore = defineStore("product", {
 
     async show(product) {
       try {
-        const response = await apiClient.get(`/api/vendor/products/${product}`);
+        const response = await apiClient.get(`/api/v1/products/${product}`);
         if (response.status === 200) {
           this.product = response.data;
           return Promise.resolve(response.data);
@@ -74,7 +74,10 @@ export const useProductStore = defineStore("product", {
     async update(product, payload) {
       this.loading = true;
       try {
-        const response = await apiClient.put(`/api/vendor/products/${product}`, payload);
+        const response = await apiClient.put(
+          `/api/v1/products/${product}`,
+          payload,
+        );
         if (response.status === 200) {
           toast.success(response.data.message);
           return Promise.resolve(response.data);
@@ -92,10 +95,12 @@ export const useProductStore = defineStore("product", {
     async media(product, payload) {
       this.loading = true;
       try {
-        const response = await apiClient.post(`/api/vendor/products/${product}/media`, payload);
+        const response = await apiClient.post(
+          `/api/v1/products/${product}/media`,
+          payload,
+        );
         if (response.status === 200) {
           toast.success(response.data.message);
-
         }
       } catch (error) {
         if (error.response?.status === 422) {
@@ -103,12 +108,12 @@ export const useProductStore = defineStore("product", {
 
           Object.values(this.errors)
             .flat()
-            .forEach(message => toast.error(message));
+            .forEach((message) => toast.error(message));
 
           return;
         }
 
-        toast.error(error.response?.data?.message || 'Something went wrong');
+        toast.error(error.response?.data?.message || "Something went wrong");
       } finally {
         this.loading = false;
       }

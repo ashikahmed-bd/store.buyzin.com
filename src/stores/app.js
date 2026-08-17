@@ -5,6 +5,7 @@ export const useAppStore = defineStore("app", {
   state: () => ({
     loading: false,
     errors: {},
+    config: null,
     dashboard: [],
   }),
 

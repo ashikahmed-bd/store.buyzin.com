@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import 'vue-sonner/style.css';
+@import "vue-sonner/style.css";
 
 @theme {
   --color-background: #00d3f3;
@@ -17,8 +17,9 @@
 
   --font-heading: "Montserrat", sans-serif;
   --font-body: "Montserrat", sans-serif;
-  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-script: Great Vibes, cursive;
 }
@@ -85,7 +86,9 @@
     width: 0px;
     height: 0px;
     background-color: transparent;
-    transition: width 0.25s ease, height 0.25s ease;
+    transition:
+      width 0.25s ease,
+      height 0.25s ease;
   }
 
   .scrollbar::-webkit-scrollbar-track {
@@ -126,18 +129,28 @@
   }
 
   .form__group {
-    @apply mb-3;
+    @apply mb-5;
+  }
+
+  .form__header {
+    @apply mb-2 flex items-center justify-between;
   }
 
   .form__label {
-    @apply mb-3;
+    @apply text-sm font-medium text-gray-700;
+  }
+
+  .form__action {
+    @apply cursor-pointer bg-white text-xs font-medium text-body transition-all duration-200;
+    @apply hover:border-primary hover:text-primary;
   }
 
   .form__control {
-    @apply max-w-full px-2.5 py-1.5 rounded border focus:border-primary focus:outline-none focus:outline-primary disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-500;
+    @apply w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition-all duration-200;
+    @apply focus:border-primary focus:ring-2 focus:ring-blue-100;
   }
 
-  .form__file{
+  .form__file {
     @apply w-full rounded border border-gray-300 bg-white text-sm
            file:mr-3 file:border-0 file:bg-gray-100
            file:px-4 file:py-2 file:text-gray-700

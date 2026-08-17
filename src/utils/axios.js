@@ -2,7 +2,7 @@ import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "https://api.buyzin.com", // http://127.0.0.1:8000  https://api.buyzin.com
+  baseURL: "http://127.0.0.1:8000", // http://127.0.0.1:8000  https://api.buyzin.com
   withCredentials: false,
   withXSRFToken: false,
 });
@@ -16,7 +16,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Response interceptor
@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
 
     // If no response (network error etc.)
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

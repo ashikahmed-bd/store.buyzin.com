@@ -5,7 +5,7 @@ export const useCategoryStore = defineStore("category", {
   state: () => ({
     loading: false,
     errors: {},
-    categories: {}
+    categories: {},
   }),
 
   getters: {},
@@ -30,7 +30,7 @@ export const useCategoryStore = defineStore("category", {
     async search(query) {
       this.loading = true;
       try {
-        const response = await apiClient.get("/api/v1/categories/search", {
+        const response = await apiClient.get("/api/v1/search/categories", {
           params: {
             query: query,
           },
