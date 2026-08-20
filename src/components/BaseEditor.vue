@@ -67,21 +67,18 @@ onMounted(() => {
       "italic",
       "strike",
       "link",
-      "|",
       "list",
       "ordered-list",
       "check",
       "outdent",
       "indent",
       "table",
-      "|",
       "quote",
       "line",
       "code",
       "inline-code",
       "insert-before",
       "insert-after",
-      "|",
       "undo",
       "redo",
       "fullscreen",
@@ -136,5 +133,13 @@ onBeforeUnmount(() => {
 
 :deep(.vditor-reset) {
   padding: 10px 9px !important;
+}
+
+:deep(.vditor-reset) p {
+  margin: 0 !important;
+}
+
+:deep(.vditor-reset) p {
+  margin: 10px 0;
 }
 </style>

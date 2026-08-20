@@ -5,6 +5,7 @@ import { useProductStore } from "@/stores/product";
 import { storeToRefs } from "pinia";
 import Loading from "@/components/Loading.vue";
 import NotFound from "@/components/NotFound.vue";
+import { Layers, Pencil } from "@lucide/vue";
 
 const productStore = useProductStore();
 const { products } = storeToRefs(productStore);
@@ -114,7 +115,17 @@ onMounted(() => {
                     </span>
                   </td>
 
-                  <td class="px-4 py-3 text-right">
+                  <td class="px-4 py-3 text-right space-x-2">
+                    <RouterLink
+                      :to="{
+                        name: 'products.variants.create',
+                        params: { id: product.id },
+                      }"
+                      class="bg-green-600 text-white px-4 py-1 text-xs rounded"
+                    >
+                      Variant
+                    </RouterLink>
+
                     <RouterLink
                       :to="{
                         name: 'products.edit',

@@ -54,6 +54,13 @@ const router = createRouter({
     },
 
     {
+      path: "/products/:id/variants",
+      name: "products.variants.create",
+      component: () => import("../views/products/variants.vue"),
+      meta: { auth: true },
+    },
+
+    {
       path: "/orders",
       name: "orders",
       component: () => import("../views/orders/index.vue"),
@@ -74,7 +81,6 @@ const router = createRouter({
       meta: { auth: true },
     },
 
-
     {
       path: "/notifications",
       name: "notifications",
@@ -90,7 +96,6 @@ const router = createRouter({
     },
   ],
 });
-
 
 router.beforeEach(async (to) => {
   const auth = useAuthStore();

@@ -18,7 +18,7 @@ const updateValue = (e) => {
 
 <template>
   <div class="mb-4">
-    <label v-if="label" class="block capitalize font-medium">
+    <label v-if="label" class="block capitalize text-sm font-medium">
       {{ label }}
       <span v-if="required" class="text-red-500">*</span>
     </label>
@@ -29,7 +29,7 @@ const updateValue = (e) => {
       :placeholder="placeholder"
       :disabled="disabled"
       :rows="rows"
-      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-primary disabled:bg-gray-100"
+      class="w-full text-sm px-3 py-2 border rounded focus:outline-none focus:border-primary disabled:bg-gray-100"
     ></textarea>
 
     <p v-if="error" class="text-danger text-xs">{{ error }}</p>

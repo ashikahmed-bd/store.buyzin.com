@@ -12,18 +12,23 @@ import BaseEditor from "@/components/BaseEditor.vue";
 import { useProductStore } from "@/stores/product";
 import { useCategoryStore } from "@/stores/category";
 import { useTaxStore } from "@/stores/tax";
-
 import { storeToRefs } from "pinia";
 import { useBrandStore } from "@/stores/brand";
+import { useRoute } from "vue-router";
+import { useAppStore } from "@/stores/app";
 
+const route = useRoute();
+const appStore = useAppStore();
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const taxStore = useTaxStore();
 const brandStore = useBrandStore();
 
+const { config } = storeToRefs(appStore);
 const { categories } = storeToRefs(categoryStore);
 const { taxes } = storeToRefs(taxStore);
 const { brands } = storeToRefs(brandStore);
+const { product } = storeToRefs(productStore);
 
 const loadCategories = async () => {
   await categoryStore.search("");
@@ -40,14 +45,15 @@ const loadTaxes = async () => {
 const form = reactive({
   name: "",
   slug: "",
-  type: "simple",
+  type: "",
   highlights: "",
   description: "",
+  cover_url: "",
   category_id: "",
   brand_id: "",
   tax_id: "",
-  base_price: "",
-  price: "",
+  base_price: 0,
+  price: 0,
   start_at: "",
   end_at: "",
   quantity: 0,
@@ -57,9 +63,12 @@ const form = reactive({
   length: 0,
   width: 0,
   height: 0,
-  estimated_delivery: "3-5 Business Days",
-  return_policy: "This product is not eligible for return or exchange",
-  warranty: "This product does not include a warranty.",
+  is_shippable: true,
+  cod_available: true,
+  is_refundable: true,
+  estimated_delivery: "3_5_days",
+  return_policy: "7_days",
+  warranty: "no_warranty",
   meta_title: "",
   meta_description: "",
   meta_keywords: "",
@@ -69,7 +78,12 @@ const form = reactive({
 const addSpec = () => {
   form.specifications.push({
     title: "",
-    items: [{ label: "", value: "" }],
+    items: [
+      {
+        label: "",
+        value: "",
+      },
+    ],
   });
 };
 
@@ -88,14 +102,87 @@ const removeItem = (specIndex, itemIndex) => {
   form.specifications[specIndex].items.splice(itemIndex, 1);
 };
 
+const media = reactive({
+  cover: null,
+  gallery: [],
+  video_url: "",
+});
+
+const mediaUpload = async () => {
+  const formData = new FormData();
+
+  if (media.cover) {
+    formData.append("cover", media.cover);
+  }
+
+  media.gallery.forEach((file) => {
+    formData.append("gallery[]", file);
+  });
+
+  if (media.video_url) {
+    formData.append("video_url", media.video_url);
+  }
+
+  await productStore.media(route.params.id, formData);
+};
+
+const loadProduct = async () => {
+  const product = await productStore.show(route.params.id);
+
+  form.name = product.data?.name ?? "";
+  form.slug = product.data?.slug ?? "";
+  form.type = product.data?.type ?? "";
+  form.highlights = product.data?.highlights ?? "";
+  form.description = product.data?.description ?? "";
+
+  media.video_url = product.data?.video_url ?? "";
+
+  form.category_id = product.data?.category?.id ?? "";
+  form.brand_id = product.data?.brand?.id ?? "";
+  form.tax_id = product.data?.tax?.id ?? "";
+
+  form.base_price = product.data?.base_price ?? 0;
+  form.price = product.data?.price ?? 0;
+
+  form.start_at = product.data?.start_at ?? "";
+  form.end_at = product.data?.end_at ?? "";
+
+  form.quantity = product.data?.quantity ?? 0;
+  form.sold_count = product.data?.sold_count ?? 0;
+
+  form.specifications = product.data?.specifications ?? [];
+
+  form.weight = product.data?.dimensions?.weight ?? 0;
+  form.length = product.data?.dimensions?.length ?? 0;
+  form.width = product.data?.dimensions?.width ?? 0;
+  form.height = product.data?.dimensions?.height ?? 0;
+
+  form.is_shippable = product.data?.is_shippable ?? true;
+  form.cod_available = product.data?.cod_available ?? true;
+  form.is_refundable = product.data?.is_refundable ?? true;
+
+  form.estimated_delivery = product.data?.estimated_delivery ?? "";
+  form.return_policy = product.data?.return_policy ?? "";
+  form.warranty = product.data?.warranty ?? "";
+
+  form.meta_title = product.data?.meta_title ?? "";
+  form.meta_description = product.data?.meta_description ?? "";
+  form.meta_keywords = product.data?.meta_keywords ?? "";
+
+  form.status = product.data?.status ?? "";
+};
+
 const submit = async () => {
-  await productStore.store(form);
+  await productStore.update(route.params.id, form);
+
+  await loadProduct();
 };
 
 onMounted(() => {
   loadCategories();
   loadTaxes();
   loadBrands();
+  loadProduct();
 });
 </script>
 
@@ -143,6 +230,7 @@ onMounted(() => {
                   ]"
                 />
               </div>
+
               <BaseEditor
                 label="Highlights"
                 v-model="form.highlights"
@@ -233,8 +321,9 @@ onMounted(() => {
             <div class="px-5 py-4 border-b">
               <h2 class="font-semibold">SEO Settings</h2>
             </div>
-            <div class="p-5 space-y-4">
+            <div class="p-4 space-y-4">
               <BaseInput label="Meta Title" v-model="form.meta_title" />
+
               <BaseTextarea
                 label="Meta Description"
                 v-model="form.meta_description"
@@ -244,6 +333,76 @@ onMounted(() => {
                 v-model="form.meta_keywords"
               />
             </div>
+          </section>
+
+          <section class="bg-white rounded-2xl border border-slate-200">
+            <div class="px-5 py-4 border-b">
+              <h2 class="font-semibold">Media</h2>
+            </div>
+
+            <form
+              @submit.prevent="mediaUpload"
+              enctype="multipart/form-data"
+              class="p-4 space-y-6"
+            >
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="block">
+                  <BaseInput
+                    v-model="media.video_url"
+                    label="Video URL"
+                    description="YouTube, Vimeo or other video link"
+                  />
+
+                  <div class="form__group">
+                    <label class="form__label">Gallery</label>
+                    <input
+                      type="file"
+                      multiple
+                      class="form__file"
+                      @change="media.gallery = Array.from($event.target.files)"
+                      accept="image/*"
+                    />
+                  </div>
+
+                  <div
+                    v-if="product.data?.gallery"
+                    class="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 py-2"
+                  >
+                    <div
+                      v-for="(image, index) in product.data?.gallery"
+                      :key="index"
+                      class="group relative overflow-hidden rounded border bg-white"
+                    >
+                      <img
+                        :src="image"
+                        class="aspect-square h-full w-full object-cover"
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form__group">
+                  <label class="form__label">Cover</label>
+                  <input
+                    type="file"
+                    class="form__file"
+                    accept="image/*"
+                    @change="media.cover = $event.target.files?.[0]"
+                  />
+
+                  <div v-if="product.data?.cover_url" class="mt-3">
+                    <img
+                      :src="product.data?.cover_url"
+                      alt="Cover Preview"
+                      class="w-24 h-auto object-cover rounded border"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <BaseButton :loading="productStore.loading">Update</BaseButton>
+            </form>
           </section>
         </div>
 
@@ -257,11 +416,11 @@ onMounted(() => {
                 <label class="form__label"> Categories </label>
 
                 <div class="relative">
-                  <select v-model="form.category_id" class="form__select">
+                  <select v-model="form.category_id" class="form__control">
                     <option value="">Select Category</option>
 
                     <template
-                      v-for="category in categories?.data ?? []"
+                      v-for="category in categories?.data"
                       :key="category.id"
                     >
                       <option :value="category.id">
@@ -291,17 +450,23 @@ onMounted(() => {
                 </div>
               </div>
 
-              <BaseSelect
-                label="Brand"
-                v-model="form.brand_id"
-                :options="
-                  brands?.data?.map((brand) => ({
-                    id: brand.id,
-                    name: brand.name,
-                  }))
-                "
-                placeholder="Select brand"
-              />
+              <div class="form__group">
+                <div class="form__header">
+                  <label class="form__label">Brands</label>
+                  <button type="button" class="form__action">Add new</button>
+                </div>
+
+                <select v-model="form.brand_id" class="form__control">
+                  <option value="">Select a brand</option>
+                  <option
+                    :value="brand.id"
+                    v-for="brand in brands.data"
+                    :key="brand.id"
+                  >
+                    {{ brand.name }}
+                  </option>
+                </select>
+              </div>
 
               <BaseSelect
                 label="Taxes"
@@ -371,7 +536,6 @@ onMounted(() => {
                 label="Estimated Delivery"
                 v-model="form.estimated_delivery"
               />
-
               <BaseTextarea
                 label="Return Policy"
                 v-model="form.return_policy"

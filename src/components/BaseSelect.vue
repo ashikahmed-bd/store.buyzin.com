@@ -24,14 +24,14 @@ const modelValue = computed({
 
 <template>
   <div class="relative block mb-3">
-    <label v-if="label" class="block capitalize font-medium">
+    <label v-if="label" class="block capitalize text-sm font-medium">
       {{ label }}
     </label>
     <select
       v-model="modelValue"
       :disabled="disabled"
       :class="[
-        'w-full border rounded px-3 py-2 focus:outline-cyan-500 focus:ring focus:ring-cyan-200',
+        'w-full border rounded text-sm px-3 py-1.5 focus:outline-cyan-500 focus:ring focus:ring-cyan-200',
         error ? 'border-red-500' : 'border-gray-300',
       ]"
     >
