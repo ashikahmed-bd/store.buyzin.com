@@ -31,7 +31,7 @@ export const useBrandStore = defineStore("brand", {
     async search(query) {
       this.loading = true;
       try {
-        const response = await apiClient.get("/api/v1/brands/search", {
+        const response = await apiClient.get("/api/v1/search/brands", {
           params: {
             query: query,
           },

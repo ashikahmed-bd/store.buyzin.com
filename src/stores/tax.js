@@ -31,7 +31,7 @@ export const useTaxStore = defineStore("tax", {
     async search(query) {
       this.loading = true;
       try {
-        const response = await apiClient.get("/api/v1/taxes/search", {
+        const response = await apiClient.get("/api/v1/search/taxes", {
           params: {
             query: query,
           },
